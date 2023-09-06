@@ -3,10 +3,11 @@ from modules.Payment_def import *
 
 ####################################################################### Samir ########################################################################
 
-card = init()
 
-#TODO send request to the merchant to get his info
-#TODO send the data or merchant & credit card to the bank to get a token
+#TODO send request to the merchant to get his info and transaction info (this is done when scanning barcode or using nfc)
+#select credit card
+card = init()
+#TODO send the data of merchant & credit card with cvv (input when select credit card) to the bank to get a token
 #TODO send the token to the merchant
 #TODO the merchant should send the token to the bank and if it's correct the transaction will be done between the merchant account & user account
 #TODO when merchant receive acknowledge that transaction was done successfully it should send signal to payment app
