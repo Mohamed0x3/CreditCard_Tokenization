@@ -4,7 +4,7 @@ from modules.Payment_def import *
 # Note: Next Comments are related to modules.Payment_def
 #       you can update it or replace it
 
-# db = "?"
+# db = "?"  ------------------> csv for testing
 # card = getCreditCridintioals()
 # card_without_pass = {
 #     "name": card["name"],
