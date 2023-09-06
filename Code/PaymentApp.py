@@ -1,6 +1,19 @@
 from modules.Project_def import *
 from modules.Payment_def import *
 
+####################################################################### Samir ########################################################################
+
+card = init()
+
+#TODO send request to the merchant to get his info
+#TODO send the data or merchant & credit card to the bank to get a token
+#TODO send the token to the merchant
+#TODO the merchant should send the token to the bank and if it's correct the transaction will be done between the merchant account & user account
+#TODO when merchant receive acknowledge that transaction was done successfully it should send signal to payment app
+#TODO the app prints info that transaction was done
+
+######################################################################################################################################################
+
 # Note: Next Comments are related to modules.Payment_def
 #       you can update it or replace it
 
@@ -19,7 +32,7 @@ from modules.Payment_def import *
 # get merchant data
 # send card data with merchant name to the bank
 
-card = "?"
+#card = "?"----------------------->done
 merchant = "?"
 transaction = "?"
 

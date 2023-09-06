@@ -4,6 +4,8 @@
 import pandas as pd
 import pathlib
 import numpy as np
+from Project_def import *
+import time
 
 
 PAYMENT_APP_DB_PATH = pathlib.Path("./tstDB/paymentAppDB.csv")
@@ -29,7 +31,7 @@ def addNewCreditCard():
     credit_card = getCreditCridintioals()
     # add card data to the app database (NOT INCLUDING THE PASSWORD) --------------------------> Not sure about storing cvv
     cardsDB = pd.read_csv(PAYMENT_APP_DB_PATH)
-    newDF = pd.DataFrame(credit_card,index=[len(cardsDB)])
+    newDF = pd.DataFrame(credit_card, index=[len(cardsDB)])
     print(newDF)
     cardsDB = pd.concat([cardsDB, newDF], axis=0)
     cardsDB.to_csv(PAYMENT_APP_DB_PATH, index=False)
@@ -37,12 +39,11 @@ def addNewCreditCard():
 
 
 def printCard(i, card):
-    print(
-        f"Card {i} Detailes: \n\n"
-        f"\tcard owener's name: {card['name']}\n"
-        f"\tcard number: {card['number']}\n"
-        f"\tcard expiration date MM/YY: {card['exp_month']}/{card['exp_year']} \n"
-    )
+    print_msg_box(
+        f"card owener's name: {card['name']}\n"
+        f"card number: {card['number']}\n"
+        f"card expiration date MM/YY: {card['exp_month']}/{card['exp_year']} \n"
+    ,indent=3,title=f"Card {i} Detailes:")
 
 
 def printAvaliableCards():
@@ -50,7 +51,6 @@ def printAvaliableCards():
     cardsDB = pd.read_csv(PAYMENT_APP_DB_PATH)
     print()
     for card, i in zip(cardsDB.values, range(len(cardsDB.values))):
-        print('-----------------------------------------------------------------------')
         printCard(i, dict(zip(cardsDB.columns, card)))
 
     return len(cardsDB.values), cardsDB.values
@@ -62,11 +62,11 @@ def selectCreditCard():
         return addNewCreditCard(), cardsLen
     print(
         f"Choose from your cards [{0}-{cardsLen-1}] or press (A/a) to add new one")
-    d = input("Waiting for your decision...")
+    d = input("Waiting for your decision...\n")
 
     while (d != 'A' and d != 'a' and not d.isnumeric()) or (d.isnumeric() and (int(d) < 0 or int(d) >= cardsLen)):
         print("Invalid input, choose from your cards or press (A/a) to add new one")
-        d = input("Waiting for your decision...")
+        d = input("Waiting for your decision...\n")
 
     if d == 'A' or d == 'a':
         return addNewCreditCard(), cardsLen
@@ -80,5 +80,11 @@ def selectCreditCard():
         }, int(d)
 
 
-a, b = selectCreditCard()
-printCard(b, a)
+def init():
+    print_msg_box("You stand in front of the payment device, ready to pay for your purchases.\nYou open your phone and launch the app, which is 99.9999999% secure and doesn't share your credit card information with the merchant.\nYou scan the barcode on the payment device, and the app quickly processes the payment.\nYou're on your way in no time.\n", 3, title='Assumption')
+    time.sleep(10)
+    credit_card, index = selectCreditCard()
+    print("Chosen Credit Card")
+    printCard(index,credit_card)
+    return credit_card
+
