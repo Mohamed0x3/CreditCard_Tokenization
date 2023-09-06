@@ -1,6 +1,5 @@
-from modules.Project_def import *
 from modules.Payment_def import *
-
+from modules.Project_def import *
 ####################################################################### Samir ########################################################################
 
 
@@ -42,10 +41,12 @@ token = {"token": "xczvzxcvzcxv"}
 # ======================== THREAD 1
 
 # PayApp act as a client with the Merchant (TODO Thread - HEMLY)
-client_socket = requestConnection(MERCHANT_PORT)
-data = receiveData(client_socket)
+client_socket_merchant = requestConnection(MERCHANT_PORT)
+print(f"Connected to the bank")
+data = receiveData(client_socket_merchant)
+print(f"Recived Data from bank: ")
 merchant = data["merchant"]
-print(f"{data}")
+print(f"\t{data}")
 # TODO Print available transactions
 # select wanted transaction (TODO Ask user - HELMY)
 data["transaction number"] = 1
@@ -54,36 +55,37 @@ transaction = data["transactions"][0]
 card = "?"
 
 # TODO - HELMY (This thread wait for token from "THREAD 2")
-
-data["token"] = token["token"]
-sendData(client_socket, data)
-
-data["approved"] = False
-sendData(client_socket, data)
-data = receiveData(client_socket)
-
-if data["approved"] is False:
-    print(f"ERROR")  # This will not happen!!
-
-
-# ======================== THREAD 2
+# ======================== THREAD 2 (Start)
 
 # PayApp act as a client with the bank
-client_socket = requestConnection(BANK_PORT)
-data = receiveData(client_socket)
+client_socket_bank = requestConnection(BANK_PORT)
+data = receiveData(client_socket_bank)
 print(f"1 {data}")
 data["message"] = "app"
-sendData(client_socket, data)
+sendData(client_socket_bank, data)
 print(f"test {data}")
-data = receiveData(client_socket)
+data = receiveData(client_socket_bank)
 while True:
     data["card"] = card
     data["merchant"] = merchant
     data["transaction"] = transaction
-    sendData(client_socket, data)
-    data = receiveData(client_socket)
+    sendData(client_socket_bank, data)
+    data = receiveData(client_socket_bank)
     if data["flag"] is False:
         print(f"wrong card data... try again")
         continue
     token = {"merchant": merchant, "token": data["token"]}
     break
+# ======================== THREAD 2 (End)
+
+data["token"] = token["token"]
+sendData(client_socket_merchant, data)
+
+data["approved"] = False
+sendData(client_socket_merchant, data)
+data = receiveData(client_socket_merchant)
+
+if data["approved"] is False:
+    print(f"ERROR")  # This will not happen!!
+
+
