@@ -18,9 +18,9 @@ def Merchant_App_1(client_socket_app):
     #################
     data = {
         "flag": True,
-        "transaction":{"transactionID": '11111',
-        "price": 120,},
-        
+        "transaction": {"transactionID": '11111',
+                        "price": 120, },
+
         "merchant": merchant,
     }
     sendData(client_socket_app, data)
@@ -62,19 +62,23 @@ def Merchant_App_1_admin(client_socket_app):
     # sendData(client_socket_app, merchant)
 
     print("sent merchant and transaction data to app")
+    print("waiting for the token")
+    data = receiveData(client_socket_app)
+    print(f"Got the token: {data}")
+    return data
     # data = receiveData(client_socket_app) #"App give \"token\" to Merchant"
     # print(data)
 
 
-def Merchant_Bank_admin(BANK_PORT):
-    client_socket_bank = requestConnection(BANK_PORT)
+def Merchant_Bank_admin(client_socket_bank,token):
     print(f"Connected to the bank")
     data = receiveData(client_socket_bank)
     print(data)  # "Bank say \"Hello\" to Merchant"
     data = "Merchant reply \"Hello\" to Bank"
     sendData(client_socket_bank, data)
-    data = "Merchant give \"token\" to Bank"
-    sendData(client_socket_bank, data)
+    # data = "Merchant give \"token\" to Bank"
+    print("sending token to the bank")
+    sendData(client_socket_bank, token)
     data = receiveData(client_socket_bank)
     print(data)  # "Bank say \"Transaction is ok\" to Merchant"
 
@@ -129,6 +133,8 @@ while False:  # TODO (SET True)
     Merchant_App_2(client_socket_app)
 
 client_socket_app = acceptConnection(merchant_socket)
-Merchant_App_1_admin(client_socket_app)
-# Merchant_Bank_admin(BANK_PORT)
-# Merchant_App_2_admin(client_socket_app)
+token = Merchant_App_1_admin(client_socket_app)
+
+client_socket_bank=requestConnection(BANK_PORT)
+Merchant_Bank_admin(client_socket_bank,token)
+Merchant_App_2_admin(client_socket_app)

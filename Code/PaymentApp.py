@@ -83,10 +83,12 @@ def App_Bank_admin(client_socket_bank, card, merchant, transaction):
     # return data
 
 
-def App_Merchant_2_admin(client_socket_merchant):
-    data = "App give \"token\" to Merchant"
-    sendData(client_socket_merchant, data)
+def App_Merchant_2_admin(client_socket_merchant,token):
+    # data = "App give \"token\" to Merchant"
+    print("sending token to the merchant")
+    sendData(client_socket_merchant, token)
     # "\"Transaction is ok\" Merchant and App are Friends?"
+    print("waiting for confirmation from merchant")
     data = receiveData(client_socket_merchant)
     print(data)
     data = "Merchant and App are Friends?... YES"
@@ -168,6 +170,7 @@ print(f"Connected to the bank")
 token = App_Bank_admin(client_socket_bank, card, merchant, transaction)
 
 print(token)
+App_Merchant_2_admin(client_socket_merchant,token)
 
 
 # TODO - HELMY (This thread wait for token from "THREAD 2")

@@ -89,7 +89,8 @@ def Bank_Communication_Merchant_admin_2():
     print(data)
     # "Merchant give \"token\" to Bank"
     data = receiveData(client_socket_Merchant)
-    print(data)
+    print(f"received the token {data}")
+    #do transaction
     data = "Bank say \"Transaction is ok\" to Merchant"
     sendData(client_socket_Merchant, data)
 
@@ -115,4 +116,4 @@ print(f"Bank Open...")
 
 # Bank_Communication()
 Bank_Communication_App_admin_1()
-# Bank_Communication_Merchant_admin_2()
+Bank_Communication_Merchant_admin_2()
