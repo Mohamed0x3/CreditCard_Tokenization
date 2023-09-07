@@ -60,8 +60,9 @@ def Bank_Communication_App_admin_1():
     sendData(client_socket_app, data)
     data = receiveData(client_socket_app) # "App reply \"Hello\" to Bank"
     print(data)
-    data = "Bank give \"token\" to App"
-    sendData(client_socket_app, data)
+    # data = "Bank give \"token\" to App"
+    # sendData(client_socket_app, data)
+
 def Bank_Communication_Merchant_admin_2():
     client_socket_Merchant = acceptConnection(bank_socket)
     data = "Bank say \"Hello\" to Merchant"

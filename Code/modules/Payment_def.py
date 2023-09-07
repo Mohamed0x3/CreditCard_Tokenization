@@ -4,11 +4,11 @@
 import pandas as pd
 import pathlib
 import numpy as np
-from Project_def import *
+from modules.Project_def import *
 import time
 
 
-PAYMENT_APP_DB_PATH = pathlib.Path("./tstDB/paymentAppDB.csv")
+PAYMENT_APP_DB_PATH = pathlib.Path("../tstDB/paymentAppDB.csv")
 
 
 def getCreditCridintioals():
@@ -82,7 +82,7 @@ def selectCreditCard():
 
 def init():
     print_msg_box("You stand in front of the payment device, ready to pay for your purchases.\nYou open your phone and launch the app, which is 99.9999999% secure and doesn't share your credit card information with the merchant.\nYou scan the barcode on the payment device, and the app quickly processes the payment.\nYou're on your way in no time.\n", 3, title='Assumption')
-    time.sleep(10)
+    # time.sleep(10)
     credit_card, index = selectCreditCard()
     print("Chosen Credit Card")
     printCard(index,credit_card)

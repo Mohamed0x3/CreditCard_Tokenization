@@ -4,19 +4,30 @@ from modules.Project_def import *
 # =================================================
 # TODO (TAHER|HELMY \ SAMIR)
 def Merchant_App_1(client_socket_app):
-        data = {
-            "flag": True,
-            "message": "",
-            "transactions": transactions,
-            "merchant": merchant,
-        }
-        data["message"] = "Here is available Transactions"
-        data["transaction number"] = "?"
-        sendData(client_socket_app, data)
-        data = receiveData(client_socket_app)
+    # data = {
+    #     "flag": True,
+    #     "message": "",
+    #     "transactions": transactions,
+    #     "merchant": merchant,
+    # }
+    # data["message"] = "Here is available Transactions"
+    # data["transaction number"] = "?"
+    # sendData(client_socket_app, data)
+    # data = receiveData(client_socket_app)
+    # transaction = transactions[data["transaction number"]]
+    #################
+    data = {
+        "flag": True,
+        "transaction":{"transactionID": '11111',
+        "price": 120,},
+        
+        "merchant": merchant,
+    }
+    sendData(client_socket_app, data)
 
-        transaction = transactions[data["transaction number"]]
 # TODO (TAHER|HELMY \ HEFNEY)
+
+
 def Merchant_Bank_1(BANK_PORT):
     client_socket_bank = requestConnection(BANK_PORT)
     data = receiveData(client_socket_bank)
@@ -35,35 +46,50 @@ def Merchant_Bank_1(BANK_PORT):
 
     approved_transaction = data["approved"]
 # TODO (TAHER|HELMY \ SAMIR)
+
+
 def Merchant_App_2(client_socket_app):
     data["approved"] = approved_transaction
 
+
+# This function do handshake with the app then send data of the merchant to the app
 def Merchant_App_1_admin(client_socket_app):
     data = "Merchant say \"Hello\" to App"
     sendData(client_socket_app, data)
-    data = receiveData(client_socket_app) #"App reply \"Hello\" to Merchant"
+    data = receiveData(client_socket_app)  # "App reply \"Hello\" to Merchant"
     print(data)
-    data = receiveData(client_socket_app) #"App give \"token\" to Merchant"
-    print(data)
+    Merchant_App_1(client_socket_app)
+    # sendData(client_socket_app, merchant)
+
+    print("sent merchant and transaction data to app")
+    # data = receiveData(client_socket_app) #"App give \"token\" to Merchant"
+    # print(data)
+
+
 def Merchant_Bank_admin(BANK_PORT):
     client_socket_bank = requestConnection(BANK_PORT)
     print(f"Connected to the bank")
     data = receiveData(client_socket_bank)
-    print(data) #"Bank say \"Hello\" to Merchant"
+    print(data)  # "Bank say \"Hello\" to Merchant"
     data = "Merchant reply \"Hello\" to Bank"
     sendData(client_socket_bank, data)
     data = "Merchant give \"token\" to Bank"
     sendData(client_socket_bank, data)
     data = receiveData(client_socket_bank)
-    print(data) #"Bank say \"Transaction is ok\" to Merchant"
+    print(data)  # "Bank say \"Transaction is ok\" to Merchant"
+
+
 def Merchant_App_2_admin(client_socket_app):
     data = "\"Transaction is ok\" Merchant and App are Friends?"
     sendData(client_socket_app, data)
-    data = receiveData(client_socket_app) #"Merchant and App are Friends?... YES"
+    # "Merchant and App are Friends?... YES"
+    data = receiveData(client_socket_app)
     print(data)
 # =================================================
 
-merchant = {"TODO"}  # TODO
+
+merchant = {"name": "Merchant1", "number": "1212121212121212", "exp_month": 9,
+            "exp_year": 2025}  # TODO
 transactions = ["TODO", "TODO1", "TODO1"]  # TODO
 transaction = ""
 approved_transaction = False
@@ -85,7 +111,7 @@ clients = {}
 
 print(f"Store Open...")
 
-while False: #TODO (SET True)
+while False:  # TODO (SET True)
     client_socket_app = acceptConnection(merchant_socket)
 
     Merchant_App_1(client_socket_app)
@@ -104,6 +130,5 @@ while False: #TODO (SET True)
 
 client_socket_app = acceptConnection(merchant_socket)
 Merchant_App_1_admin(client_socket_app)
-Merchant_Bank_admin(BANK_PORT)
-Merchant_App_2_admin(client_socket_app)
-
+# Merchant_Bank_admin(BANK_PORT)
+# Merchant_App_2_admin(client_socket_app)
