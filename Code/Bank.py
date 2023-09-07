@@ -2,6 +2,8 @@ from modules.Project_def import *
 
 # =============================
 # TODO (SAMIR / HEFENY / TAHER|HELMY)
+
+
 def Bank_Communication():
     while True:
         client_socket = acceptConnection(bank_socket)
@@ -54,27 +56,45 @@ def Bank_Communication():
                     data["approved"] = False
                     data["message"] = "data is wrong.. try again"
 
+
+def Bank_Communication_App_admin_2(client_socket_app):
+    data = receiveData(client_socket_app)
+    print("Received data from app")
+    print(data)
+    # do work and get the token
+    # store the token in DB
+    token = "11221122445522145214521452"
+    print("sending token to the app")
+    sendData(client_socket_app, token)
+
+
 def Bank_Communication_App_admin_1():
     client_socket_app = acceptConnection(bank_socket)
     data = "Bank say \"Hello\" to App"
     sendData(client_socket_app, data)
-    data = receiveData(client_socket_app) # "App reply \"Hello\" to Bank"
+    print("here")
+    data = receiveData(client_socket_app)  # "App reply \"Hello\" to Bank"
     print(data)
+    Bank_Communication_App_admin_2(client_socket_app)
     # data = "Bank give \"token\" to App"
     # sendData(client_socket_app, data)
+
 
 def Bank_Communication_Merchant_admin_2():
     client_socket_Merchant = acceptConnection(bank_socket)
     data = "Bank say \"Hello\" to Merchant"
     sendData(client_socket_Merchant, data)
-    data = receiveData(client_socket_Merchant) # "Merchant reply \"Hello\" to Bank"
+    # "Merchant reply \"Hello\" to Bank"
+    data = receiveData(client_socket_Merchant)
     print(data)
-    data = receiveData(client_socket_Merchant) # "Merchant give \"token\" to Bank"
+    # "Merchant give \"token\" to Bank"
+    data = receiveData(client_socket_Merchant)
     print(data)
     data = "Bank say \"Transaction is ok\" to Merchant"
     sendData(client_socket_Merchant, data)
 
 # =============================
+
 
 print(f"Openning The Bank... (please wait)")
 
@@ -95,4 +115,4 @@ print(f"Bank Open...")
 
 # Bank_Communication()
 Bank_Communication_App_admin_1()
-Bank_Communication_Merchant_admin_2()
+# Bank_Communication_Merchant_admin_2()

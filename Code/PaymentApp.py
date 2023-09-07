@@ -21,23 +21,31 @@ from modules.Payment_def import *
 # TODO (SAMIR \ HEFNEY) => This function will end with (app get token from the bank)
 def App_Bank(client_socket_bank, card, merchant, transaction):
     # PayApp act as a client with the bank
-    data = receiveData(client_socket_bank)
-    print(f"1 {data}")
-    data["message"] = "app"
+    # data = receiveData(client_socket_bank)
+    # print(f"1 {data}")
+    # data["message"] = "app"
+    # sendData(client_socket_bank, data)
+    # print(f"test {data}")
+    # data = receiveData(client_socket_bank)
+    # while True:
+    #     data["card"] = card
+    #     data["merchant"] = merchant
+    #     data["transaction"] = transaction
+    #     sendData(client_socket_bank, data)
+    #     data = receiveData(client_socket_bank)
+    #     if data["flag"] is False:
+    #         print(f"wrong card data... try again")
+    #         continue
+    #     token = {"merchant": merchant, "token": data["token"]}
+    #     return token
+    data = {"card": card, "merchant": merchant, "transaction": transaction}
     sendData(client_socket_bank, data)
-    print(f"test {data}")
+    print("sent data to bank, waiting for token")
     data = receiveData(client_socket_bank)
-    while True:
-        data["card"] = card
-        data["merchant"] = merchant
-        data["transaction"] = transaction
-        sendData(client_socket_bank, data)
-        data = receiveData(client_socket_bank)
-        if data["flag"] is False:
-            print(f"wrong card data... try again")
-            continue
-        token = {"merchant": merchant, "token": data["token"]}
-        return token
+    print(f"Received the token: {data}")
+    return data
+
+
 # TODO (SAMIR \ TAHER|HELMY) => This function will end with (app give token to merchant and do transaction)
 
 
@@ -69,7 +77,7 @@ def App_Bank_admin(client_socket_bank, card, merchant, transaction):
     print(data)
     data = "App reply \"Hello\" to Bank"
     sendData(client_socket_bank, data)
-    return App_Bank(client_socket_bank,card,merchant,transaction)
+    return App_Bank(client_socket_bank, card, merchant, transaction)
     # data = receiveData(client_socket_bank)  # "Bank give \"token\" to App"
     # print(data)
     # return data
@@ -97,6 +105,7 @@ def checkCard(card):
             cvv = input("Please enter your CVV\n")
         else:
             card = init()
+            cvv = input("Please enter your CVV\n")
 
     return card, cvv
 ####################################################################### Samir ########################################################################
@@ -152,17 +161,13 @@ transaction = Merchant_Transaction_Data["transaction"]
 # Now I have merchant data, transaction data and credit card, I'm ready to ask for token
 
 
-
-
-
-client_socket_bank=requestConnection(BANK_PORT)
+client_socket_bank = requestConnection(BANK_PORT)
 print(f"Connected to the bank")
 
 
+token = App_Bank_admin(client_socket_bank, card, merchant, transaction)
 
-
-
-
+print(token)
 
 
 # TODO - HELMY (This thread wait for token from "THREAD 2")
