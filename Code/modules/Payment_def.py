@@ -8,7 +8,7 @@ from modules.Project_def import *
 import time
 
 
-PAYMENT_APP_DB_PATH = pathlib.Path("../tstDB/paymentAppDB.csv")
+PAYMENT_APP_DB_PATH = pathlib.Path("./tstDB/paymentAppDB.csv")
 
 
 def getCreditCridintioals():

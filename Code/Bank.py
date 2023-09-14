@@ -59,20 +59,24 @@ def Bank_Communication():
 
 def Bank_Communication_App_admin_2(client_socket_app):
     data = receiveData(client_socket_app)
-    print("Received data from app")
+    print("Received encrypted data from app:\n")
     print(data)
+    decrypted = decrypt(ast.literal_eval(str(data)), BANK_KEY)
+    data = json.loads(decrypted.decode())
+    print(f"Decrypted data:\n{data}")
     # do work and get the token
     # store the token in DB
-    token = "11221122445522145214521452"
-    print("sending token to the app")
-    sendData(client_socket_app, token)
+    token = b"11221122445522145214521452"
+    print("sending encrypted token to the app")
+    encryped=encrypt(token,PAYMENT_KEY.publickey())
+    sendData(client_socket_app, encryped)
 
 
 def Bank_Communication_App_admin_1():
     client_socket_app = acceptConnection(bank_socket)
+    print("sending hello signal to app")
     data = "Bank say \"Hello\" to App"
     sendData(client_socket_app, data)
-    print("here")
     data = receiveData(client_socket_app)  # "App reply \"Hello\" to Bank"
     print(data)
     Bank_Communication_App_admin_2(client_socket_app)
@@ -83,13 +87,16 @@ def Bank_Communication_App_admin_1():
 def Bank_Communication_Merchant_admin_2():
     client_socket_Merchant = acceptConnection(bank_socket)
     data = "Bank say \"Hello\" to Merchant"
+    print("sending hello signal to merchant..")
     sendData(client_socket_Merchant, data)
     # "Merchant reply \"Hello\" to Bank"
     data = receiveData(client_socket_Merchant)
     print(data)
     # "Merchant give \"token\" to Bank"
     data = receiveData(client_socket_Merchant)
-    print(f"received the token {data}")
+    print(f"received encrypted token\n {data}")
+    decrypted = decrypt(ast.literal_eval(str(data)), BANK_KEY)
+    print(f"Decrypted token\n{decrypted}")
     #do transaction
     data = "Bank say \"Transaction is ok\" to Merchant"
     sendData(client_socket_Merchant, data)
