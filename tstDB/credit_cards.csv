@@ -1,2 +1,2 @@
-person,card_num,CVV,Balance
-Ahmed,123456781,321,7000
+name,number,exp_month,exp_year,cvv,balance
+Ahmed,123456781,12,2024,321,4500

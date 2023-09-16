@@ -1,86 +1,96 @@
 import csv
 import hashlib
+import pandas as pd
+import pathlib
+
 order = {
     0: "Bank",
     1: "Samsung_Pay",
     2: "Merchant"
 }   # (enumerated dictionary) cheap edition
 # Be careful of filepaths / how i'm reading keys because it's different
+BANK_CARDS_DB_PATH = pathlib.Path("./tstDB/credit_cards.csv")
+BANK_TOKENS_DB_PATH = pathlib.Path("./tstDB/token.csv")
+
 
 class Bank:
 
-    credit_card_filepath = "C:\\Users\\abdo_\\Desktop\\credit_cards.csv"   # credit_card filepath we can change it
+    # credit_card filepath we can change it
+    credit_card_filepath = "C:\\Users\\abdo_\\Desktop\\credit_cards.csv"
     tokenized_cards_filepath = "C:\\Users\\abdo_\\Desktop\\token.csv"      # we can ignore it
     public_key_path = "C:\\Users\\abdo_\\Desktop\\public_keys.txt"
-    credit_card_list = []   # to convert from csv file to list
+    # credit_card_list = []   # to convert from csv file to list
     tokenized_list = []     # to store tokens of cards
-    private_key = ""        # will be written in phase 2
-    public_key = []         # list to store public_keys
+    # private_key = ""        # will be written in phase 2
+    # public_key = []         # list to store public_keys
 
     def __init__(self):
-        with open(self.credit_card_filepath, 'r') as csvfile:
-            csv_reader = csv.DictReader(csvfile)   # i don't know why but here when using delimiter='\t' it gives error
-            for row in csv_reader:
-                self.credit_card_list.append(row)
-                # i made a list format = [{'person': , 'card_num': ,'CVV':,'balance':}]
+        self.credit_card_df = pd.read_csv(BANK_CARDS_DB_PATH)
 
-        with open(self.public_key_path, 'r') as file:
-            # assume that the order is bank , samsung_pay , merchant
-            i = 0
-            for line in file:
-                self.public_key.append({order[i]: int(line)})
-                i += 1
-        with open(self.tokenized_cards_filepath, 'r') as csvfile:
-            csv_reader = csv.DictReader(csvfile, delimiter="\t")
-            for row in csv_reader:
-                self.tokenized_list.append(row)
-
-    def update_db(self):
-        with open(self.credit_card_filepath, 'w', newline='') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.credit_card_list[0].keys())
-            writer.writeheader()
-            for i in self.credit_card_list:
-                writer.writerow(i)
+        self.tokens_df = pd.read_csv(BANK_TOKENS_DB_PATH)
+        # self.tokenized_list = self.tokens_df["token"]
 
     # my idea is to make the token = (credit_card_num + public_key of merchant +cvv) then hash it using sha_512
     # so for same credit_card the public_key make tokens different
-    def transact(self, token, public_key, cvv, product_price):
-        for i in self.credit_card_list:
-            temp = i["card_num"]+cvv+str(public_key)
+    def transact(self, token, product_price, merchant_id):
+
+        for i, row in zip(range(len(self.credit_card_df)), self.credit_card_df.values):
+            temp = str(row[1])+str(row[4])+str(merchant_id)
             temp_hash = hashlib.sha512()
             temp_hash.update(temp.encode('utf-8'))
             result = temp_hash.hexdigest()
+
             if result == token:
                 # i found it so check on balance to see if i can make transaction
-                if int(i['Balance']) > product_price:
-                    new_balance = int(i['Balance']) - product_price
-                    i['Balance'] = new_balance          # update the current balance for this run
-                    self.update_db()
+                if int(row[5]) >= product_price:
+                    new_balance = int(row[5]) - product_price
+                    # update the current balance for this run
+                    row[5] = new_balance
+                    self.credit_card_df.loc[i] = row
+                    self.credit_card_df.to_csv(BANK_CARDS_DB_PATH, index=False)
                     print("Successful Transaction")
+                    return 1
                 else:
                     print("No money, Unsuccessful Transaction")
-            break
+                    return 0
 
-    def tokenize(self, credit_card, cvv, public_key):
-        for i in self.credit_card_list:
-            if credit_card == i["card_num"] and cvv == i["CVV"]:     # check if the card is present
-                token = hashlib.sha512()    # create sha512 object
-                token.update((credit_card+cvv+str(public_key)).encode('utf-8'))
-                # update is used to concatenate string inside sha object so when i call digest it hash the data
-                result = token.hexdigest()                               # hashing and put result in result
-                self.tokenized_list.append(result)           # put it in the list for the current run-time
-                with open(self.tokenized_cards_filepath, 'a', newline='')as csvfile:
-                    # write it in csv file for future run-times
-                    writer = csv.writer(csvfile)
-                    writer.writerow({result})
-                print("successful tokenization".title())
-                return 0
-        print("unsuccessful tokenization, The card given or cvv is wrong".title())
+        print("Wrong token")
+        return -1
 
+    def addToken(self, token):
+        newDF = pd.DataFrame({"token": token}, index=[
+                             len(self.tokenized_list)])
+        self.tokens_df = pd.concat([self.tokens_df, newDF], axis=0)
+        self.tokens_df.to_csv(BANK_TOKENS_DB_PATH, index=False)
+        self.tokenized_list = self.tokens_df["token"]
+
+    def tokenize(self, credit_card, cvv, merchant_id):
+        # check if the card is present
+        filter = self.credit_card_df[(self.credit_card_df["number"]
+                                     == credit_card) & (self.credit_card_df["cvv"] == cvv)]
+
+        if len(filter) == 0:
+            print("unsuccessful tokenization, The card given or cvv is wrong".title())
+            return -1
+        else:
+            token = hashlib.sha512()    # create sha512 object
+            token.update((str(credit_card)+str(cvv) +
+                         str(merchant_id)).encode('utf-8'))
+            # update is used to concatenate string inside sha object so when i call digest it hash the data
+            # hashing and put result in result
+            result = token.hexdigest()
+
+            self.addToken(result)
+            print("successful tokenization".title())
+
+            return result
 
 
 mybank = Bank()
-# print(mybank.credit_card_list)
-# mybank.tokenize('123456781',"321",1)
-#mybank.transact('b234ed3597ee338efdce2b7809e5ba16d2528d4f8c0d1e1ce9f06e9b16548f83595667fd478c58a98f7a3a688912aa3ce56c76db7b04cf45735a08a1b79c6f8f',  1,'321',1000)
-# print(mybank.tokenized_list)
+# print(mybank.tokens_df)
+# mybank.tokenize(123456781,321,121212)
+# print(mybank.tokens_df)
+print(mybank.credit_card_df)
+mybank.transact("588ef73015491751c58f14480273d3357a53b0aec2c2152fe7fef598eddd5e28f663f5caeeda1a02a9ae555209ffca993a35d8b4e7724ce5a758cc2e5dd4feb1", 8500, 121212)
+print(mybank.credit_card_df)
+
