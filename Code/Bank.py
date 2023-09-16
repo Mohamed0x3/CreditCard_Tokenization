@@ -1,4 +1,5 @@
 from modules.Project_def import *
+from Bank_implementation import *
 
 # =============================
 # TODO (SAMIR / HEFENY / TAHER|HELMY)
@@ -64,11 +65,10 @@ def Bank_Communication_App_admin_2(client_socket_app):
     decrypted = decrypt(ast.literal_eval(str(data)), BANK_KEY)
     data = json.loads(decrypted.decode())
     print(f"Decrypted data:\n{data}")
-    # do work and get the token
-    # store the token in DB
-    token = b"11221122445522145214521452"
+    token = bytes(str(bank.tokenize(data["card"]["number"], data["card"]["cvv"], data["merchant"]
+                  ["merchant_id"], data["transaction"]["transactionID"])), encoding="utf-8")
     print("sending encrypted token to the app")
-    encryped=encrypt(token,PAYMENT_KEY.publickey())
+    encryped = encrypt(token, PAYMENT_KEY.publickey())
     sendData(client_socket_app, encryped)
 
 
@@ -96,15 +96,20 @@ def Bank_Communication_Merchant_admin_2():
     data = receiveData(client_socket_Merchant)
     print(f"received encrypted token\n {data}")
     decrypted = decrypt(ast.literal_eval(str(data)), BANK_KEY)
+    decrypted = json.loads(decrypted.decode())
+
     print(f"Decrypted token\n{decrypted}")
-    #do transaction
-    data = "Bank say \"Transaction is ok\" to Merchant"
-    sendData(client_socket_Merchant, data)
+    res = bank.transact(decrypted["token"], decrypted["transaction"]["price"],
+                        decrypted["merchant_id"], decrypted["transaction"]["transactionID"])
+    # do transaction
+    # data = "Bank say \"Transaction is ok\" to Merchant"
+    sendData(client_socket_Merchant, res)
 
 # =============================
 
 
 print(f"Openning The Bank... (please wait)")
+bank = Bank()
 
 bank_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 bank_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

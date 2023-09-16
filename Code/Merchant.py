@@ -18,8 +18,7 @@ def Merchant_App_1(client_socket_app):
     #################
     data = {
         "flag": True,
-        "transaction": {"transactionID": '11111',
-                        "price": 120, },
+        "transaction": transaction,
 
         "merchant": merchant,
     }
@@ -86,14 +85,20 @@ def Merchant_Bank_admin(client_socket_bank, token):
     sendData(client_socket_bank, data)
     # data = "Merchant give \"token\" to Bank"
     print("sending encrypted token to the bank")
-    enToken=encrypt(token,BANK_KEY.publickey())
+    data = {"token": token.decode("utf-8"),
+            "merchant_id": str(merchant["merchant_id"]), "transaction": transaction}
+    # print(data)
+    payload = json.dumps(data).encode()
+    enToken = encrypt(payload, BANK_KEY.publickey())
     sendData(client_socket_bank, enToken)
     data = receiveData(client_socket_bank)
     print(data)  # "Bank say \"Transaction is ok\" to Merchant"
 
+    Merchant_App_2_admin(client_socket_app, data)
 
-def Merchant_App_2_admin(client_socket_app):
-    data = "\"Transaction is ok\" Merchant and App are Friends?"
+
+def Merchant_App_2_admin(client_socket_app, data):
+    # data = "\"Transaction is ok\" Merchant and App are Friends?"
     sendData(client_socket_app, data)
     # "Merchant and App are Friends?... YES"
     data = receiveData(client_socket_app)
@@ -101,10 +106,10 @@ def Merchant_App_2_admin(client_socket_app):
 # =================================================
 
 
-merchant = {"name": "Merchant1", "number": "1212121212121212", "exp_month": 9,
-            "exp_year": 2025}  # TODO
+merchant = {"merchant_id": 12123232}  # TODO
 transactions = ["TODO", "TODO1", "TODO1"]  # TODO
-transaction = ""
+transaction = {"transactionID": '11111',
+               "price": 120, }
 approved_transaction = False
 
 token = ""
@@ -146,4 +151,4 @@ token = Merchant_App_1_admin(client_socket_app)
 
 client_socket_bank = requestConnection(BANK_PORT)
 Merchant_Bank_admin(client_socket_bank, token)
-Merchant_App_2_admin(client_socket_app)
+# Merchant_App_2_admin(client_socket_app)

@@ -4,25 +4,35 @@ import rich
 
 df = pd.read_csv(pathlib.Path("./tstDB/credit_cards.csv"))
 # print(df.head())
-for i, row in zip(range(len(df)), df.values):
-    print(row)
-    row[0]="Mohamed"
-    print(i)
-    df.loc[i]=row
+# for i, row in zip(range(len(df)), df.values):
+#     print(row)
+#     row[0]="Mohamed"
+#     print(i)
+#     df.loc[i]=row
 
-    print(row)
+#     print(row)
 
+# print(df["number"][0])
 
-print()
+# print()
 print(df)
+# paymentAppDBPath = pathlib.Path("./tstDB/paymentAppDB.csv")
+
+# print(1234567891234567)
+# print(f"card number: {df['number'][1]}\n")
+# df2=pd.read_csv(paymentAppDBPath)
+# # print(df2)
+# df=pd.DataFrame({"name": ['Samir','Taher','Hefney','Helmy'], "number": ['1234567891234567','7654321987654321','1122334455667788','8877665544332211'], "exp_month": [9,7,5,12],
+#              "exp_year": [2025,2024,2026,2025], "cvv": [123,456,789,321],"balance":[7000,45406,6546,45248]})
 
 
+# df.to_csv(pathlib.Path("./tstDB/credit_cards.csv"),index=False)
 
-# filter = len(df[(df["number"] == 123456781) & (df["cvv"] == 321)])
+filter = len(df[(df["number"] == 1234567891234567) & (df["cvv"] == 123)])
+print(filter)
 
 # print(filter)
 
-# paymentAppDBPath = pathlib.Path("./tstDB/paymentAppDB.csv")
 
 # df=pd.DataFrame({"name": ['Samir','Taher','Hefney','Helmy'], "number": ['1234567891234567','7654321987654321','1122334455667788','8877665544332211'], "exp_month": [9,7,5,12],
 #              "exp_year": [2025,2024,2026,2025], "cvv": [123,456,789,321]})
