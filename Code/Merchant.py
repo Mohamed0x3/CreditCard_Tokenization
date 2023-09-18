@@ -38,9 +38,7 @@ def Merchant_Com_App(client_socket_app):
 # NOTE: This function do handshake with the bank
 #  then Merchant send token and Merchant data to the bank
 #  then Receive transaction approval
-#  then send transaction approval to the Payment App
-def Merchant_Bank_admin(client_socket_bank, token):
-
+def Merchant_Bank_general(client_socket_bank, token):
     print("Connecting to Bank...")
     # Handshake (Merchant - Bank)
     Handshake_client_Com(client_socket_bank, "Merchant")
@@ -58,6 +56,13 @@ def Merchant_Bank_admin(client_socket_bank, token):
     data = receiveData_RSA(client_socket_bank, BANK_KEY, MERCHANT_KEY)
     print(f"Received transaction approval...")
     print(f"Transaction approval: \"{data}\"")
+    return data
+
+# NOTE: Call Merchant_Bank_general
+#  then send transaction approval to the Payment App
+def Merchant_Bank_admin(client_socket_bank, token):
+
+    data = Merchant_Bank_general(client_socket_bank, token)
 
     # send transaction approval to Paymaent App
     print(f"Merchant: sending [ Transaction approval( \"{data}\" ) ] to the App")
@@ -69,6 +74,10 @@ def Merchant_Bank_admin(client_socket_bank, token):
 
 # =================================================
 
+###############################################################################################################
+####################################################################### Main ########################################################################
+###############################################################################################################
+
 
 merchant = {"merchant_id": 12123232}  # TODO
 transactions = ["TODO", "TODO1", "TODO1"]  # TODO
@@ -78,27 +87,59 @@ approved_transaction = False
 token = ""
 
 # ========================
-# Merchant act as a server with the PayAPP
-print(f"Openning The Store... (please wait)")
 
-merchant_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-merchant_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-merchant_socket.bind((IP, MERCHANT_PORT))
-merchant_socket.listen()
+mode = -1
+print("This Module has two modes\n",
+      "\t(1) If you want this module to run as real merchant\n",
+      "\t(2) If you want this module to run as hacker(act as merchant)")
+mode = input("Enter mode number\n")
+while mode != "1" and mode != "2":
+    print("invalid input, Please try again...")
+    mode = input("Enter mode number\n")
 
-sockets_list = [merchant_socket]
+print("===================================================")
+print("===================    Loading     ================")
+print("===================================================\n")
 
-clients = {}
+if mode == "1":
+    # Merchant act as a server with the PayAPP
+    print(f"Openning The Store... (please wait)")
 
-print(f"Store Open...")
-print("=======================================\n")
+
+    merchant_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    merchant_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    merchant_socket.bind((IP, MERCHANT_PORT))
+    merchant_socket.listen()
+
+    sockets_list = [merchant_socket]
+
+    clients = {}
+
+    print(f"Store Open...")
+    print("=======================================\n")
 
 
-client_socket_app = acceptConnection(merchant_socket)
-print("Payment App is connecting...")
-token = Merchant_Com_App(client_socket_app)
+    client_socket_app = acceptConnection(merchant_socket)
+    print("Payment App is connecting...")
+    token = Merchant_Com_App(client_socket_app)
 
-print("\n=======================================\n")
+    print("\n=======================================\n")
 
-client_socket_bank = requestConnection(BANK_PORT)
-Merchant_Bank_admin(client_socket_bank, token)
+    client_socket_bank = requestConnection(BANK_PORT)
+    Merchant_Bank_admin(client_socket_bank, token)
+else:
+    print("==== Gathering info ====")
+    print("Need Merchant data...")
+    merchant["merchant_id"] = input("\tEnter - Merchant Id: ")
+    print("Need Transaction data...")
+    transaction["transactionID"] = int(input("\tEnter - Transaction Id: "))
+    transaction["price"] = int(input("\tEnter - Transaction Value: "))
+    print("Need Token...")
+    token = input("\tEnter - Token: ")
+
+    input("Confirm that Bank is open first...\npress enter key to start...\n")
+    input("Are you sure that it's open?...(press enter key to start)\n")
+
+    print("==== Let's get this money ( •̀ᴗ•́ ) ====")
+    client_socket_bank = requestConnection(BANK_PORT)
+    Merchant_Bank_general(client_socket_bank, token)

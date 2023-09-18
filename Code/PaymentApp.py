@@ -79,11 +79,13 @@ def checkCard(card):
 
     return card, cvv
 
+###############################################################################################################
 ####################################################################### Main ########################################################################
+###############################################################################################################
 
-input("press any key to start...\n")
-input("Confirm that Bank and Merchant are running first...\npress any key to start...\n")
-input("Sorry, you need to cofirm ^^ \npress any key to start...\n")
+input("press enter key to start...\n")
+input("Confirm that Bank and Merchant are running first...\npress enter key to start...\n")
+input("Sorry, you need to cofirm ^^ \npress enter key to start...\n")
 
 client_socket_merchant = requestConnection(MERCHANT_PORT)
 print(f"Connecting to the merchant..")
@@ -93,7 +95,7 @@ merchant = Merchant_Transaction_Data["merchant"]
 transaction = Merchant_Transaction_Data["transaction"]
 
 print("\n=======================================")
-input("press any key to continue...\n")
+input("press enter key to continue...\n")
 
 card = init()
 card, cvv = checkCard(card)

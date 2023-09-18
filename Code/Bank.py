@@ -60,10 +60,10 @@ def Bank_Com_Merchant():
     print(f"Token:[ {data['token']} ] \nMerchant_id: [ {data['merchant_id']} ] \ntransaction: [ {data['transaction']} ]")
     
     # do transaction
-    print("\nTransaction is running...")
+    print("\nTransaction proccess is running...")
     res = bank.transact(data["token"], data["transaction"]["price"],
                         data["merchant_id"], data["transaction"]["transactionID"])
-    print("Transaction is done...\n")
+    print("Transaction proccess is done...\n")
     
     # send transaction approval to Merchant 
     print(f"Bank: sending transaction approval:[ \"{res}\" ] to the Payment App")
@@ -71,15 +71,30 @@ def Bank_Com_Merchant():
 
 # =============================
 
+###############################################################################################################
+####################################################################### Main ########################################################################
+###############################################################################################################
+
+
+mode = -1
+print("This Module has two modes\n",
+      "\t(1) If you want this module to run as Normal\n",
+      "\t(2) If you want this module to simulte action to hacker(act as merchant)")
+mode = input("Enter mode number\n")
+while mode != "1" and mode != "2":
+    print("invalid input, Please try again...")
+    mode = input("Enter mode number\n")
+
+print("===================================================")
+print("===================    Loading     ================")
+print("===================================================\n")
 
 print(f"Openning The Bank... (please wait)")
 bank = Bank()
-
 bank_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 bank_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 bank_socket.bind((IP, BANK_PORT))
 bank_socket.listen()
-
 sockets_list = [bank_socket]
 
 clients = {}
@@ -87,7 +102,14 @@ clients = {}
 print(f"Bank Open...")
 print("=======================================\n")
 
-# Bank act as a server with the PayApp
-# Bank act as a server with the Merchant
-Bank_Com_App()
-Bank_Com_Merchant()
+if mode == "1":
+
+    # Bank act as a server with the PayApp
+    # Bank act as a server with the Merchant
+    Bank_Com_App()
+    Bank_Com_Merchant()
+
+else:
+    # Bank act as a server with the Merchant
+    Bank_Com_Merchant()
+
