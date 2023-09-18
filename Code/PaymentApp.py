@@ -6,54 +6,64 @@ def App_Bank(client_socket_bank, card, merchant, transaction):
 
     data = {"card": card, "merchant": merchant, "transaction": transaction}
 
-    payload = json.dumps(data).encode()
-    encrypted = encrypt(payload, BANK_KEY.publickey())
-    sendData(client_socket_bank, encrypted)
+    sendData_RSA(client_socket_bank, data, PAYMENT_KEY, BANK_KEY)
     print("sending encrypted data to bank, waiting for token")
-    data = receiveData(client_socket_bank)
-    print(f"Received encrypted token: \n{data}")
+    
+    # NOTE: TOKENIZATION
+    # NOTE: From
+    # data = receiveData(client_socket_bank)
+    # NOTE: to
+    data = receiveData_RSA(client_socket_bank,BANK_KEY,PAYMENT_KEY)
+    # NOTE: End - to
+    # print(f"Received encrypted token: \n{data}")
+    # NOTE: From
+    # decrypted=decrypt(ast.literal_eval(str(data)),PAYMENT_KEY)
+    # print(f"Decrypted token:\n{decrypted}")
+    # NOTE: to
+    print(f"Decrypted token:\n{data}")
+    # NOTE: End - to
 
-    decrypted=decrypt(ast.literal_eval(str(data)),PAYMENT_KEY)
-    print(f"Decrypted token:\n{decrypted}")
-    return decrypted
+    return data
 
 def App_Merchant_1_admin(client_socket_merchant):
     # "Merchant say \"Hello\" to App"
-    data = receiveData(client_socket_merchant)
+    data = receiveData_RSA(client_socket_merchant,MERCHANT_KEY, PAYMENT_KEY)
     print(data)
     data = "App reply \"Hello\" to Merchant"
     print("replying to the merchant to confirm connection..")
-    sendData(client_socket_merchant, data)
+    sendData_RSA(client_socket_merchant, data,PAYMENT_KEY,MERCHANT_KEY)
     print("waiting for merchant info..")
-    data = receiveData(client_socket_merchant)
-    print(f"received encrypted data from the merchant:\n{data}")
-    
-    decrypted = decrypt(ast.literal_eval(str(data)), PAYMENT_KEY)
-    data = json.loads(decrypted.decode())
+    data = receiveData_RSA(client_socket_merchant,MERCHANT_KEY, PAYMENT_KEY)
+
     print(f"Merchant & Transaction Data after dectyption:\n {data}")
     return data
 
 
 def App_Bank_admin(client_socket_bank, card, merchant, transaction):
-    data = receiveData(client_socket_bank)  # "Bank say \"Hello\" to App"
+    data = receiveData_RSA(client_socket_bank,BANK_KEY,PAYMENT_KEY)  # "Bank say \"Hello\" to App"
     print(data)
     print("sending reply signal to bank")
     data = "App reply \"Hello\" to Bank"
-    sendData(client_socket_bank, data)
+    sendData_RSA(client_socket_bank, data,PAYMENT_KEY,BANK_KEY)
     return App_Bank(client_socket_bank, card, merchant, transaction)
 
 
 def App_Merchant_2_admin(client_socket_merchant,token):
     # data = "App give \"token\" to Merchant"
     print("sending encrypted token to the merchant")
-    enToken=encrypt(token,MERCHANT_KEY.publickey())
-    sendData(client_socket_merchant, enToken)
+    # NOTE: From
+    # NOTE: NEXT line ERROR
+    # enToken=encrypt(token,MERCHANT_KEY.publickey())
+    # sendData(client_socket_merchant, enToken)
+    # NOTE: to
+    sendData_RSA(client_socket_merchant, token, PAYMENT_KEY, MERCHANT_KEY)
+    # NOTE: End - to
     # "\"Transaction is ok\" Merchant and App are Friends?"
     print("waiting for confirmation from merchant")
-    data = receiveData(client_socket_merchant)
+    data = receiveData_RSA(client_socket_merchant,MERCHANT_KEY, PAYMENT_KEY)
     print(data)
     data = "Merchant and App are Friends?... YES"
-    sendData(client_socket_merchant, data)
+    sendData_RSA(client_socket_merchant, data, PAYMENT_KEY, MERCHANT_KEY)
 
 
 def checkCard(card):

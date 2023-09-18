@@ -12,9 +12,7 @@ def Merchant_App_1(client_socket_app):
         "merchant": merchant,
     }
 
-    payload = json.dumps(data).encode()
-    encrypted = encrypt(payload, PAYMENT_KEY.publickey())
-    sendData(client_socket_app, encrypted)
+    sendData_RSA(client_socket_app, data,MERCHANT_KEY, PAYMENT_KEY)
 
 
 # NOTE:
@@ -24,20 +22,29 @@ def Merchant_App_1(client_socket_app):
 def Merchant_App_1_admin(client_socket_app):
     data = "Merchant say \"Hello\" to App"
     print("sending hello to app..")
-    sendData(client_socket_app, data)
-    data = receiveData(client_socket_app)  # "App reply \"Hello\" to Merchant"
+    sendData_RSA(client_socket_app, data,MERCHANT_KEY,PAYMENT_KEY)
+    data = receiveData_RSA(client_socket_app,PAYMENT_KEY,MERCHANT_KEY)  # "App reply \"Hello\" to Merchant"
     print(data)
     Merchant_App_1(client_socket_app)
     # sendData(client_socket_app, merchant)
 
     print("sent merchant and transaction data encrypted to app")
     print("waiting for the token")
-    data = receiveData(client_socket_app)
-    print(f"Got encrypted token:\n {data}")
-    decrypted = decrypt(ast.literal_eval(str(data)), MERCHANT_KEY)
-    print(f"Decrypted token:\n {decrypted}")
+    # NOTE: from
+    # data = receiveData(client_socket_app)
+    # NOTE: to
+    data = receiveData_RSA(client_socket_app, PAYMENT_KEY, MERCHANT_KEY)
+    # NOTE: End - to
+    # NOTE: From
+    # print(f"Got encrypted token:\n {data}")
+    # decrypted = decrypt(ast.literal_eval(str(data)), MERCHANT_KEY)
+    # print(f"Decrypted token:\n {decrypted}")
+    # return decrypted
+    # NOTE: to
+    print(f"Decrypted token:\n {data}")
+    return data
+    # NOTE: End - to
 
-    return decrypted
     # data = receiveData(client_socket_app) #"App give \"token\" to Merchant"
     # print(data)
 
@@ -48,20 +55,30 @@ def Merchant_App_1_admin(client_socket_app):
 #  then send transaction approval to the Payment App
 def Merchant_Bank_admin(client_socket_bank, token):
     print(f"Connected to the bank")
-    data = receiveData(client_socket_bank)
+    data = receiveData_RSA(client_socket_bank,BANK_KEY, MERCHANT_KEY)
     print(data)  # "Bank say \"Hello\" to Merchant"
     print("sending reply signal to bank")
     data = "Merchant reply \"Hello\" to Bank"
-    sendData(client_socket_bank, data)
+    sendData_RSA(client_socket_bank, data,MERCHANT_KEY, BANK_KEY)
     # data = "Merchant give \"token\" to Bank"
     print("sending encrypted token to the bank")
-    data = {"token": token.decode("utf-8"),
+    # NOTE: From
+    # NOTE: Error in next line
+    # data = {"token": token.decode("utf-8"),
+    #         "merchant_id": str(merchant["merchant_id"]), "transaction": transaction}
+    # NOTE: to
+    data = {"token": token,
             "merchant_id": str(merchant["merchant_id"]), "transaction": transaction}
+    # NOTE: End - to
     # print(data)
-    payload = json.dumps(data).encode()
-    enToken = encrypt(payload, BANK_KEY.publickey())
-    sendData(client_socket_bank, enToken)
-    data = receiveData(client_socket_bank)
+    # NOTE: From
+    # payload = json.dumps(data).encode()
+    # enToken = encrypt(payload, BANK_KEY.publickey())
+    # sendData(client_socket_bank, enToken)
+    # NOTE: to
+    sendData_RSA(client_socket_bank, data, MERCHANT_KEY, BANK_KEY)
+    # NOTE: End - to
+    data = receiveData_RSA(client_socket_bank, BANK_KEY, MERCHANT_KEY)
     print(data)  # "Bank say \"Transaction is ok\" to Merchant"
 
     Merchant_App_2_admin(client_socket_app, data)
@@ -70,9 +87,9 @@ def Merchant_Bank_admin(client_socket_bank, token):
 # NOTE: Send transaction approval to Paymaent App
 def Merchant_App_2_admin(client_socket_app, data):
     # data = "\"Transaction is ok\" Merchant and App are Friends?"
-    sendData(client_socket_app, data)
+    sendData_RSA(client_socket_app, data,MERCHANT_KEY, PAYMENT_KEY)
     # "Merchant and App are Friends?... YES"
-    data = receiveData(client_socket_app)
+    data = receiveData_RSA(client_socket_app, PAYMENT_KEY, MERCHANT_KEY)
     print(data)
 
 
