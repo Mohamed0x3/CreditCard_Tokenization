@@ -1,5 +1,6 @@
 from modules.Project_def import *
 from Bank_implementation import *
+from modules.Sequence_comm_def import *
 
 # =============================
 
@@ -10,27 +11,29 @@ from Bank_implementation import *
 #  then Bank do tokenization
 #  then Bank send token to App
 def Bank_Com_App():
-    
+
     # Bank accept App connection 
     client_socket_app = acceptConnection(bank_socket)
     
+    print("Payment App is connecting...")
     # Handshake (Bank - App)
-    print("sending hello signal to app")
-    data = "Bank say \"Hello\" to App"
-    sendData_RSA(client_socket_app, data,BANK_KEY,PAYMENT_KEY)
-    data = receiveData_RSA(client_socket_app,PAYMENT_KEY,BANK_KEY)  # "App reply \"Hello\" to Bank"
-    print(data)
+    Handshake_server_Com(client_socket_app, "Bank")
     
-    # receive [merchant, transaction] data
+    print("\n=======================================")
+    print("waiting for [card, merchant, transaction]...\n")
+    # receive [card, merchant, transaction] data
     data = receiveData_RSA(client_socket_app,PAYMENT_KEY,BANK_KEY)
-    print(f"Decrypted data:\n{data}")
-
+    print(f"Received required data...")
+    print(f"Card info:[ {data['card']} ] \nmerchant: [ {data['merchant']} ] \ntransaction: [ {data['transaction']} ]")
+    
     # do Tokenization
+    print("Tokenization is running...")
     token = str(bank.tokenize(data["card"]["number"], data["card"]["cvv"], data["merchant"]
                   ["merchant_id"], data["transaction"]["transactionID"]))
+    print("Tokenization is done...")
     
     # Send token to app
-    print("sending encrypted token to the app")
+    print(f"Bank: sending [ {token} ] to the Payment App")
     sendData_RSA(client_socket_app, token,BANK_KEY,PAYMENT_KEY)
 
 
@@ -45,22 +48,25 @@ def Bank_Com_Merchant():
     # Accept Merchant connection
     client_socket_Merchant = acceptConnection(bank_socket)
     
+    print("Merchant is connecting...")
     # Handshake (Bank - Merchant)
-    data = "Bank say \"Hello\" to Merchant"
-    print("sending hello signal to merchant..")
-    sendData_RSA(client_socket_Merchant, data, BANK_KEY, MERCHANT_KEY) 
-    data = receiveData_RSA(client_socket_Merchant, MERCHANT_KEY, BANK_KEY) # "Merchant reply \"Hello\" to Bank"
-    print(data)
+    Handshake_server_Com(client_socket_Merchant, "Bank")
     
+    print("\n=======================================")
+    print("waiting for [token, merchant, transaction]...\n")
     # receive [merchant - transaction - token] data from Merchant
-    decrypted = receiveData_RSA(client_socket_Merchant, MERCHANT_KEY, BANK_KEY)
-    print(f"Decrypted token\n{decrypted}")
+    data = receiveData_RSA(client_socket_Merchant, MERCHANT_KEY, BANK_KEY)
+    print(f"Received required data...")
+    print(f"Token:[ {data['token']} ] \nMerchant_id: [ {data['merchant_id']} ] \ntransaction: [ {data['transaction']} ]")
     
     # do transaction
-    res = bank.transact(decrypted["token"], decrypted["transaction"]["price"],
-                        decrypted["merchant_id"], decrypted["transaction"]["transactionID"])
+    print("\nTransaction is running...")
+    res = bank.transact(data["token"], data["transaction"]["price"],
+                        data["merchant_id"], data["transaction"]["transactionID"])
+    print("Transaction is done...\n")
     
     # send transaction approval to Merchant 
+    print(f"Bank: sending transaction approval:[ \"{res}\" ] to the Payment App")
     sendData_RSA(client_socket_Merchant, res,BANK_KEY, MERCHANT_KEY)
 
 # =============================
@@ -79,7 +85,7 @@ sockets_list = [bank_socket]
 clients = {}
 
 print(f"Bank Open...")
-
+print("=======================================\n")
 
 # Bank act as a server with the PayApp
 # Bank act as a server with the Merchant

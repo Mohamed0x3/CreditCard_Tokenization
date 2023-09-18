@@ -1,42 +1,37 @@
 from modules.Project_def import *
+from modules.Sequence_comm_def import *
 
 
 # =================================================
 
-# NOTE: This function sends [Merchant - Transaction] to Payment App
-def Merchant_App_1(client_socket_app):
+# NOTE: Merchant do handshake with the App
+#  then send [Merchant - Transaction] to App
+#  then Receive Token
+def Merchant_Com_App(client_socket_app):
+    
+    # NFC happens here, Then Merchant send [Merchant, Transaction] to Payment App
+
+    # Handshake (Merchant - Payment App)
+    Handshake_server_Com(client_socket_app, "Merchant")
+
+    # send [Merchant - Transaction] data to App
     data = {
         "flag": True,
-        "transaction": transaction,
 
+        "transaction": transaction,
         "merchant": merchant,
     }
-
+    print(f"Merchant: sending [ Merchant({data['merchant']}) - Transaction({data['transaction']}) ]")
     sendData_RSA(client_socket_app, data,MERCHANT_KEY, PAYMENT_KEY)
 
-
-# NOTE: Merchant do handshake with the app
-#  then send data of the merchant to the app
-#  then Receive Token
-def Merchant_App_1_admin(client_socket_app):
-    
-    # Handshake (Merchant - Payment App)
-    data = "Merchant say \"Hello\" to App"
-    print("sending hello to app..")
-    sendData_RSA(client_socket_app, data,MERCHANT_KEY,PAYMENT_KEY)
-    data = receiveData_RSA(client_socket_app,PAYMENT_KEY,MERCHANT_KEY)  # "App reply \"Hello\" to Merchant"
-    print(data)
-
-    # NFC happens here, Then Merchant send [Merchant, Transaction] to Payment App
-    Merchant_App_1(client_socket_app)
-
-    print("sent merchant and transaction data encrypted to app")
-    print("waiting for the token")
+    print("\n=======================================")
+    print("waiting for the token...\n")
 
     # receive token from Payment App
     data = receiveData_RSA(client_socket_app, PAYMENT_KEY, MERCHANT_KEY)
+    print(f"Received token...")
 
-    print(f"Decrypted token:\n {data}")
+    print(f"token: \n[ {data} ]")
     return data
 
 
@@ -46,33 +41,30 @@ def Merchant_App_1_admin(client_socket_app):
 #  then send transaction approval to the Payment App
 def Merchant_Bank_admin(client_socket_bank, token):
 
+    print("Connecting to Bank...")
     # Handshake (Merchant - Bank)
-    print(f"Connected to the bank")
-    data = receiveData_RSA(client_socket_bank,BANK_KEY, MERCHANT_KEY)
-    print(data)  # "Bank say \"Hello\" to Merchant"
-    print("sending reply signal to bank")
-    data = "Merchant reply \"Hello\" to Bank"
-    sendData_RSA(client_socket_bank, data,MERCHANT_KEY, BANK_KEY)
+    Handshake_client_Com(client_socket_bank, "Merchant")
 
     # send token and Merchant data to the bank
-    print("sending encrypted token to the bank")
+    print(f"Merchant: sending [ \n\t- Merchant({merchant}) \n\t- transaction({transaction}) \n\t- token({token}) \n\t] to the Bank")
     data = {"token": token,
             "merchant_id": str(merchant["merchant_id"]), "transaction": transaction}
     sendData_RSA(client_socket_bank, data, MERCHANT_KEY, BANK_KEY)
     
+    print("\n=======================================")
+    print("waiting for the transaction approval...\n")
+
     # receive transaction approval from the bank
     data = receiveData_RSA(client_socket_bank, BANK_KEY, MERCHANT_KEY)
-    print(data)  # "Bank say \"Transaction is ok\" to Merchant"
+    print(f"Received transaction approval...")
+    print(f"Transaction approval: \"{data}\"")
 
-    # receive transaction approval from the bank
-    Merchant_App_2_admin(client_socket_app, data)
-
-
-# send transaction approval to Paymaent App
-def Merchant_App_2_admin(client_socket_app, data):
+    # send transaction approval to Paymaent App
+    print(f"Merchant: sending [ Transaction approval( \"{data}\" ) ] to the App")
     sendData_RSA(client_socket_app, data,MERCHANT_KEY, PAYMENT_KEY)
     data = receiveData_RSA(client_socket_app, PAYMENT_KEY, MERCHANT_KEY)
     print(data)
+
 
 
 # =================================================
@@ -99,9 +91,14 @@ sockets_list = [merchant_socket]
 clients = {}
 
 print(f"Store Open...")
+print("=======================================\n")
+
 
 client_socket_app = acceptConnection(merchant_socket)
-token = Merchant_App_1_admin(client_socket_app)
+print("Payment App is connecting...")
+token = Merchant_Com_App(client_socket_app)
+
+print("\n=======================================\n")
 
 client_socket_bank = requestConnection(BANK_PORT)
 Merchant_Bank_admin(client_socket_bank, token)

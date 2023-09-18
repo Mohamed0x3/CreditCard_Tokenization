@@ -1,3 +1,5 @@
+from modules.Project_def import *
+
 
 
 # ============================================================================================================
@@ -5,11 +7,50 @@
 # ============================================================================================================
 
 
+# =========================================== Handshake - Start ==============================================
+
+
+def Handshake_client_Com(client_socket, my_name):
+    print("\nHandshake - Start")
+    message = ""
+    # ======================
+    # Syn
+    print(f"{my_name}: Sending Syn...")
+    message = f"{my_name}: Syn..."
+    sendData(client_socket, message)
+    # Syn-Ack
+    message = receiveData(client_socket)
+    print(message)
+    # Ack
+    print(f"{my_name}: Sending Ack...")
+    message = f"{my_name}: Ack..."
+    sendData(client_socket, message)
+    # ======================
+    print("Handshake - Finished\n")
+
+def Handshake_server_Com(client_socket, my_name):
+    print("\nHandshake - Start")
+    message = ""
+    # ======================
+    # Syn
+    message = receiveData(client_socket)
+    print(message)
+    # Syn-Ack
+    print(f"{my_name}: Sending Syn-Ack...")
+    message = f"{my_name}: Syn-Ack..."
+    sendData(client_socket, message)
+    # Ack
+    message = receiveData(client_socket)
+    print(message)
+    # ======================
+    print("Handshake - Finished\n")
+
+# =========================================== Handshake - End ================================================
+
+
 # ============================================================================================================
 # ======================================= This is BANK =======================================================
 # ============================================================================================================
-
-
 
 # ============================================================================================================
 # ======================================= This is PaymentApp =================================================
