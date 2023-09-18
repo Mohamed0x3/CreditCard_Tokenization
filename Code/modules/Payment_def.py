@@ -1,5 +1,3 @@
-# Note: THIS FILE IS DUMMY
-#       you can update it or replace it
 
 import pandas as pd
 import pathlib
