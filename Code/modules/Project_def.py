@@ -9,6 +9,7 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 import ast
 import json
+import time
 
 from Crypto.Cipher import PKCS1_OAEP
 
@@ -64,11 +65,24 @@ def receiveData(client_socket):
     full_msg = b""
     new_msg = True
     while True:
-        msg = client_socket.recv(16)  # buffer >= HEADER_SIZE
-        if new_msg:
-            msglen = int(msg[:HEADER_SIZE])
-            new_msg = False
-        full_msg += msg
+        try:
+            msg = client_socket.recv(16)  # buffer >= HEADER_SIZE
+            if new_msg:
+                msglen = int(msg[:HEADER_SIZE])
+                new_msg = False
+            full_msg += msg
+        except:
+            print("Sorry, other side is disconnected \nWill close in 5 seconds...")
+            time.sleep(1)
+            print("Will close in 4 seconds...")
+            time.sleep(1)
+            print("Will close in 3 seconds...")
+            time.sleep(1)
+            print("Will close in 2 seconds...")
+            time.sleep(1)
+            print("Will close in 1 second...")
+            time.sleep(1)
+            sys.exit()
 
         if len(full_msg) - HEADER_SIZE == msglen:
             d = pickle.loads(full_msg[HEADER_SIZE:])
