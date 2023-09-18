@@ -65,7 +65,7 @@ def App_Merchant_2_admin(client_socket_merchant,token):
 
 def checkCard(card):
     cvv = input("Please enter your CVV\n")
-    while cvv != card['cvv']:
+    while not cvv.isnumeric() or cvv != card['cvv']:
         incorrect = input(
             "Incorrect CVV, press 1 to enter CVV or 2 to choose another card\n")
         while incorrect != '2' and incorrect != '1':
