@@ -51,8 +51,12 @@ BANK_KEY, MERCHANT_KEY, PAYMENT_KEY = readKeys()
 # I am the Reciver
 def receiveData_RSA(client_socket,  Sender_KEY, Receiver_KEY):
     data = receiveData(client_socket)
+    # NOTE: from
     plainData = decrypt(ast.literal_eval(str(data)), Receiver_KEY)
     plainData = json.loads(plainData.decode())
+    # NOTE: to
+    # plainData = decrypt(ast.literal_eval(str(data)), Receiver_KEY)
+    # NOTE: End - to
 
     return plainData
 
@@ -78,8 +82,12 @@ def receiveData(client_socket):
 
 # I am the Sender
 def sendData_RSA(client_socket,data, Sender_KEY, Receiver_KEY):
+    # NOTE: from
     payload = json.dumps(data).encode()
     encryptedData = encrypt(payload, Receiver_KEY.publickey())
+    # NOTE: to
+    # encryptedData = encrypt(data, Receiver_KEY.publickey())
+    # NOTE: End - to
 
     sendData(client_socket,encryptedData)
 
@@ -159,6 +167,8 @@ def generatePublicKeys():
     f.write(BankKey.export_key('PEM'))
     f.close()
 
+    print("Progress info: Bank_key generated")
+
     random_generator = Random.new().read
     # generate pub and priv key
     MerchantKey = RSA.generate(4096, random_generator)
@@ -166,9 +176,13 @@ def generatePublicKeys():
     f.write(MerchantKey.export_key('PEM'))
     f.close()
 
+    print("Progress info: Merchant_key generated")
+
     random_generator = Random.new().read
     # generate pub and priv key
     PaymentKey = RSA.generate(4096, random_generator)
     f = open('./publicKeyAuthority/Payment_key.pem', 'wb')
     f.write(PaymentKey.export_key('PEM'))
     f.close()
+    
+    print("Progress info: Payment_key generated")
