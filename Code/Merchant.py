@@ -140,6 +140,14 @@ else:
     input("Confirm that Bank is open first...\npress enter key to start...\n")
     input("Are you sure that it's open?...(press enter key to start)\n")
 
-    print("==== Let's get this money ( •̀ᴗ•́ ) ====")
+    print("==== Let's get this money ( •̀ᴗ•́ ) ====\n")
     client_socket_bank = requestConnection(BANK_PORT)
-    Merchant_Bank_general(client_socket_bank, token)
+    data = Merchant_Bank_general(client_socket_bank, token)
+    if data == "Successful Transaction":
+        print("\t\t==== [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] ====\n")
+        print("\t\t==== (̅_̅_̅_̅(̅_̅_̅_̅_̅_̅_̅_̅_̅̅_̅()ڪے~ ~ ====\n")
+    else:
+        print("\t\t==== OH NOOOOOOOOOOOO ====\n")
+        print("\t\t==== ( 눈_눈) ====\n")
+        print("\t\t==== ( ˃̣̣̥⌓˂̣̣̥) ====\n\n\n\n")
+    
