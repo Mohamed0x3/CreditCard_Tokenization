@@ -50,13 +50,12 @@ BANK_KEY, MERCHANT_KEY, PAYMENT_KEY = readKeys()
 
 # I am the Reciver
 def receiveData_RSA(client_socket,  Sender_KEY, Receiver_KEY):
+
+    # Receive
     data = receiveData(client_socket)
-    # NOTE: from
+    # Decrypt
     plainData = decrypt(ast.literal_eval(str(data)), Receiver_KEY)
     plainData = json.loads(plainData.decode())
-    # NOTE: to
-    # plainData = decrypt(ast.literal_eval(str(data)), Receiver_KEY)
-    # NOTE: End - to
 
     return plainData
 
@@ -82,13 +81,11 @@ def receiveData(client_socket):
 
 # I am the Sender
 def sendData_RSA(client_socket,data, Sender_KEY, Receiver_KEY):
-    # NOTE: from
+
+    # Encrypt
     payload = json.dumps(data).encode()
     encryptedData = encrypt(payload, Receiver_KEY.publickey())
-    # NOTE: to
-    # encryptedData = encrypt(data, Receiver_KEY.publickey())
-    # NOTE: End - to
-
+    # Send
     sendData(client_socket,encryptedData)
 
 def sendData(client_socket, data):
