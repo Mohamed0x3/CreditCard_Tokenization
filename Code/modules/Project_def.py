@@ -12,12 +12,21 @@ import json
 
 from Crypto.Cipher import PKCS1_OAEP
 
+
+# =====================================================================================
+# ======================================= Constants ===================================
+# =====================================================================================
+
 HEADER_SIZE = 10
 IP = "127.0.0.1"
 APP_PORT = 1234
 BANK_PORT = 1235
 MERCHANT_PORT = 1236
 
+
+# =====================================================================================
+# ================================= RSA KEYS ==========================================
+# =====================================================================================
 
 def readKeys():
     f = open('./publicKeyAuthority/Bank_key.pem', 'r')
@@ -35,6 +44,18 @@ def readKeys():
 BANK_KEY, MERCHANT_KEY, PAYMENT_KEY = readKeys()
 
 
+# =====================================================================================
+# ================================= Receive Data ======================================
+# =====================================================================================
+
+# I am the Reciver
+def receiveData_RSA(client_socket,  Sender_KEY, Receiver_KEY):
+    data = receiveData(client_socket)
+    plainData = decrypt(ast.literal_eval(str(data)), Receiver_KEY)
+    plainData = json.loads(plainData.decode())
+
+    return plainData
+
 def receiveData(client_socket):
     # Receive Data
     full_msg = b""
@@ -44,12 +65,34 @@ def receiveData(client_socket):
         if new_msg:
             msglen = int(msg[:HEADER_SIZE])
             new_msg = False
-
         full_msg += msg
 
         if len(full_msg) - HEADER_SIZE == msglen:
             d = pickle.loads(full_msg[HEADER_SIZE:])
             return d
+
+
+# =====================================================================================
+# ==================================== Send Data ======================================
+# =====================================================================================
+
+# I am the Sender
+def sendData_RSA(client_socket,data, Sender_KEY, Receiver_KEY):
+    payload = json.dumps(data).encode()
+    encryptedData = encrypt(payload, Receiver_KEY.publickey())
+
+    sendData(client_socket,encryptedData)
+
+def sendData(client_socket, data):
+    msg = pickle.dumps(data)
+    msg = bytes(f"{len(msg):<{HEADER_SIZE}}", "utf-8") + msg
+
+    client_socket.send(msg)
+
+
+# =====================================================================================
+# ==================================== Connection =====================================
+# =====================================================================================
 
 
 def requestConnection(PORT):
@@ -67,13 +110,6 @@ def acceptConnection(my_socket):
     return client_socket
 
 
-def sendData(client_socket, data):
-    msg = pickle.dumps(data)
-    msg = bytes(f"{len(msg):<{HEADER_SIZE}}", "utf-8") + msg
-
-    client_socket.send(msg)
-
-
 def print_msg_box(msg, indent=1, width=None, title=None):
     """Print message-box with optional title."""
     lines = msg.split('\n')
@@ -89,10 +125,10 @@ def print_msg_box(msg, indent=1, width=None, title=None):
     box += f'╚{"═" * (width + indent * 2)}╝'  # lower_border
     print(box)
 
-# def gcd(x, y):
-#     while y:
-#         x, y = y, x % y
-#     return x
+
+# =====================================================================================
+# ======================================= OLD RSA =====================================
+# =====================================================================================
 
 
 def coprime(a, b):
@@ -104,68 +140,6 @@ def modInverse(a, b):
         if (((a % b) * (i % b)) % b == 1):
             return i
     return -1
-
-
-# This function is just used to calculate public keys | useless
-# def getPublicKeys(p, q):
-#     n = p*q
-#     phi_n = (p-1)*(q-1)
-#     e = -1
-#     eArr=[]
-#     for i in range(2, phi_n):
-#         if coprime(i, phi_n):
-#             eArr.append(i)
-
-#     e=random.choice(eArr)
-
-#     return e,n
-
-# e,n=getPublicKeys(839,853)
-# print(f"e: {e}, n: {n}")
-
-# def readPublicKeys(): | useless
-#     with open(".\publicKeyAuthority\Bank_Public_Key.txt", "r") as file:
-#         line = file.readline()
-#         numbers = line.split()
-#         Be, Bn = int(numbers[0]), int(numbers[1])
-
-#     with open(".\publicKeyAuthority/Merchant_Public_Key.txt", "r") as file:
-#         line = file.readline()
-#         numbers = line.split()
-#         Me, Mn = int(numbers[0]), int(numbers[1])
-
-#     with open(".\publicKeyAuthority/PaymentApp_Public_Key.txt", "r") as file:
-#         line = file.readline()
-#         numbers = line.split()
-#         Pe, Pn = int(numbers[0]), int(numbers[1])
-
-#     return Be, Bn, Me, Mn, Pe, Pn
-
-# BANK_E, BANK_N, MERCHANT_E, MERCHANT_N, PAYMENT_E, PAYMENT_N = readPublicKeys()
-
-
-# def Bank_Encrypt():
-#     pass
-
-
-# def Bank_Decrypt():
-#     pass
-
-
-# def Merchant_Encrypt():
-#     pass
-
-
-# def Merchant_Decrypt():
-#     pass
-
-
-# def Payment_Encrypt():
-#     pass
-
-
-# def Payment_Decrypt():
-#     pass
 
 
 def encrypt(message, public_key):
@@ -198,34 +172,3 @@ def generatePublicKeys():
     f = open('./publicKeyAuthority/Payment_key.pem', 'wb')
     f.write(PaymentKey.export_key('PEM'))
     f.close()
-
-# generatePublicKeys()
-
-
-# random_generator = Random.new().read
-# key = RSA.generate(1024, random_generator)  # generate pub and priv key
-# f = open('mykey.pem', 'wb')
-# f.write(key.export_key('PEM'))
-# f.close()
-
-# publickey = key.publickey()  # pub key export for exchange
-
-# payload = json.dumps({"ff": "f"}).encode()
-
-# encrypted = encrypt(payload, publickey)
-
-# print('encrypted message:', encrypted)  # ciphertext
-
-# decrypted = decrypt(ast.literal_eval(str(encrypted)), key)
-# dict = json.loads(decrypted.decode())
-
-# print('decrypted', dict)
-
-# print(key.publickey)
-
-
-# print(BANK_KEY.publickey)
-# print()
-# print(MERCHANT_KEY.publickey)
-# print()
-# print(PAYMENT_KEY.publickey)
