@@ -78,8 +78,8 @@ def Bank_Com_Merchant():
 
 mode = -1
 print("This Module has two modes\n",
-      "\tenter (1) If you want this module to run as Normal\n",
-      "\tenter (2) If you want this module to simulte action to hacker(act as merchant)\n")
+      "\t(1) If you want this module to run as Normal\n",
+      "\t(2) If you want this module to simulte action to hacker(act as merchant)")
 mode = input("Enter mode number\n")
 while mode != "1" and mode != "2":
     print("invalid input, Please try again...")

@@ -104,27 +104,10 @@ token = ""
 
 # ========================
 
-
-print("Simulation has two modes\n",
-      "\tenter (1) If you want guided simulation\n",
-      "\tenter (2) If you want normal simulation\n")
-
-guide = input("Enter mode number\n")
-while guide != "1" and guide != "2":
-    print("invalid input, Please try again...")
-    mode = input("Enter mode number\n")
-    
-if guide == "1":
-    Guided_Mode = True
-else:
-    Guided_Mode = False
-
-print("===================================================")
-
 mode = -1
 print("This Module has two modes\n",
-      "\tenter (1) If you want this module to run as real merchant\n",
-      "\tenter (2) If you want this module to run as hacker(act as merchant)\n")
+      "\t(1) If you want this module to run as real merchant\n",
+      "\t(2) If you want this module to run as hacker(act as merchant)")
 mode = input("Enter mode number\n")
 while mode != "1" and mode != "2":
     print("invalid input, Please try again...")
