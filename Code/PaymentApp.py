@@ -97,6 +97,18 @@ def checkCard(card):
 ###############################################################################################################
 
 
+print("Simulation has two modes\n",
+      "\t(1) guided simulation \"Guided_Mode = True\"\n",
+      "\t(2) normal simulation \"Guided_Mode = False\"\n")
+
+if Guided_Mode:
+    print("Current Mode: guided simulation")
+else:
+    print("Current Mode: normal simulation")
+print("if you want to change it: toggle \"Guided_Mode\" value in \"Project_def.py\" file")
+
+print("===================================================\n")
+
 input("press enter key to start...\n")
 input("Confirm that Bank and Merchant are running first...\npress enter key to start...\n")
 input("Sorry, you need to cofirm ^^ \npress enter key to start...\n")

@@ -76,6 +76,18 @@ def Bank_Com_Merchant():
 ###############################################################################################################
 
 
+print("Simulation has two modes\n",
+      "\t(1) guided simulation \"Guided_Mode = True\"\n",
+      "\t(2) normal simulation \"Guided_Mode = False\"\n")
+
+if Guided_Mode:
+    print("Current Mode: guided simulation")
+else:
+    print("Current Mode: normal simulation")
+print("if you want to change it: toggle \"Guided_Mode\" value in \"Project_def.py\" file")
+
+print("===================================================\n")
+
 mode = -1
 print("This Module has two modes\n",
       "\t(1) If you want this module to run as Normal\n",
