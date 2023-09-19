@@ -14,6 +14,14 @@ from time import sleep
 
 from Crypto.Cipher import PKCS1_OAEP
 
+# ======================================= Guided Mode ===================================
+Guided_Mode = True
+
+def SendData_Guid(other_side):
+    input(f"press enter to send data to {other_side}...")
+
+def ReceiveData_Guid(other_side):
+    print(f"waiting for data from {other_side}...")
 
 # =====================================================================================
 # ======================================= Constants ===================================
@@ -53,6 +61,14 @@ BANK_KEY, MERCHANT_KEY, PAYMENT_KEY = readKeys()
 # I am the Reciver
 def receiveData_RSA(client_socket,  Sender_KEY, Receiver_KEY):
 
+    # Guided Mode
+    if Guided_Mode:
+        if Sender_KEY == BANK_KEY:
+            ReceiveData_Guid("Bank")
+        elif Sender_KEY == MERCHANT_KEY:
+            ReceiveData_Guid("Merchant")
+        elif Sender_KEY == PAYMENT_KEY:
+            ReceiveData_Guid("Payment App")
     # Receive
     data = receiveData(client_socket)
     # Decrypt
@@ -97,6 +113,14 @@ def receiveData(client_socket):
 # I am the Sender
 def sendData_RSA(client_socket,data, Sender_KEY, Receiver_KEY):
 
+    if Guided_Mode:
+        if Receiver_KEY == BANK_KEY:
+            SendData_Guid("Bank")
+        elif Receiver_KEY == MERCHANT_KEY:
+            SendData_Guid("Merchant")
+        elif Receiver_KEY == PAYMENT_KEY:
+            SendData_Guid("Payment App")
+    
     # Encrypt
     payload = json.dumps(data).encode()
     encryptedData = encrypt(payload, Receiver_KEY.publickey())
