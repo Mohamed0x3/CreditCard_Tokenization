@@ -77,13 +77,14 @@ def Merchant_Bank_admin(client_socket_bank, token):
 ###############################################################################################################
 ####################################################################### Main ########################################################################
 ###############################################################################################################
+mint=0
+tint=0
 
+merchants=[{"merchant_id": 11111111},{"merchant_id": 22222222},{"merchant_id": 33333333},{"merchant_id": 44444444}]
 
-
-merchant = {"merchant_id": 12123232}  # TODO
-transactions = ["TODO", "TODO1", "TODO1"]  # TODO
-transaction = {"transactionID": '11111',
-               "price": 120, }
+merchant = merchants[mint]
+transactions = [{"transactionID": '11111',"price": 100, },{"transactionID": '22222',"price": 1000, },{"transactionID": '33333',"price": 5000, },{"transactionID": '44444',"price": 50000, }]
+transaction = transactions[tint]
 approved_transaction = False
 token = ""
 
