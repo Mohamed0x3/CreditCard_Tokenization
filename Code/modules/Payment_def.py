@@ -27,6 +27,7 @@ def getCreditCridintioals():
 
 def addNewCreditCard():
     credit_card = getCreditCridintioals()
+    credit_card["number"] = credit_card["number"]+'c'
     # add card data to the app database (NOT INCLUDING THE PASSWORD) --------------------------> Not sure about storing cvv
     cardsDB = pd.read_csv(PAYMENT_APP_DB_PATH)
     newDF = pd.DataFrame(credit_card, index=[len(cardsDB)])
@@ -39,9 +40,8 @@ def addNewCreditCard():
 def printCard(i, card):
     print_msg_box(
         f"card owener's name: {card['name']}\n"
-        f"card number: {card['number']}\n"
-        f"card expiration date MM/YY: {card['exp_month']}/{card['exp_year']} \n"
-    ,indent=3,title=f"Card {i} Detailes:")
+        f"card number: {card['number'][:-1]}\n"
+        f"card expiration date MM/YY: {card['exp_month']}/{card['exp_year']} \n", indent=3, title=f"Card {i} Detailes:")
 
 
 def printAvaliableCards():
@@ -80,9 +80,8 @@ def selectCreditCard():
 
 def init():
     print_msg_box("You stand in front of the payment device, ready to pay for your purchases.\nYou open your phone and launch the app, which is 99.9999999% secure and doesn't share your credit card information with the merchant.\nYou scan the barcode on the payment device, and the app quickly processes the payment.\nYou're on your way in no time.\n", 3, title='Assumption')
-    # time.sleep(10)
+    time.sleep(10)
     credit_card, index = selectCreditCard()
     print("Chosen Credit Card")
-    printCard(index,credit_card)
+    printCard(index, credit_card)
     return credit_card
-

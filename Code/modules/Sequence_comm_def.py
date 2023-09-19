@@ -12,38 +12,51 @@ from modules.Project_def import *
 
 def Handshake_client_Com(client_socket, my_name):
     print("\nHandshake - Start")
+    sleep(0.5)
     message = ""
     # ======================
     # Syn
     print(f"{my_name}: Sending Syn...")
+    sleep(0.5)
     message = f"{my_name}: Syn..."
     sendData(client_socket, message)
     # Syn-Ack
     message = receiveData(client_socket)
     print(message)
+    sleep(0.5)
     # Ack
     print(f"{my_name}: Sending Ack...")
+    sleep(0.5)
     message = f"{my_name}: Ack..."
     sendData(client_socket, message)
+    sleep(1)
     # ======================
     print("Handshake - Finished\n")
+    sleep(0.5)
+
 
 def Handshake_server_Com(client_socket, my_name):
     print("\nHandshake - Start")
+    sleep(0.5)
     message = ""
     # ======================
     # Syn
     message = receiveData(client_socket)
     print(message)
+    sleep(0.5)
     # Syn-Ack
     print(f"{my_name}: Sending Syn-Ack...")
+    sleep(0.5)
     message = f"{my_name}: Syn-Ack..."
     sendData(client_socket, message)
     # Ack
     message = receiveData(client_socket)
     print(message)
+    sleep(1)
     # ======================
     print("Handshake - Finished\n")
+    sleep(0.5)
+
 
 # =========================================== Handshake - End ================================================
 

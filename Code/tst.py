@@ -28,8 +28,8 @@ print(df)
 
 # df.to_csv(pathlib.Path("./tstDB/credit_cards.csv"),index=False)
 
-filter = len(df[(df["number"] == 1234567891234567) & (df["cvv"] == 123)])
-print(filter)
+# filter = len(df[(df["number"] == 1234567891234567) & (df["cvv"] == 123)])
+# print(filter)
 
 # print(filter)
 

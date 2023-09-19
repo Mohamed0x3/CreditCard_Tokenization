@@ -67,7 +67,7 @@ def Bank_Com_Merchant():
     
     # send transaction approval to Merchant 
     print(f"Bank: sending transaction approval:[ \"{res}\" ] to the Payment App")
-    sendData_RSA(client_socket_Merchant, res,BANK_KEY, MERCHANT_KEY)
+    sendData_RSA(client_socket_Merchant, res, BANK_KEY, MERCHANT_KEY)
 
 # =============================
 

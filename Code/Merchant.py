@@ -8,7 +8,7 @@ from modules.Sequence_comm_def import *
 #  then send [Merchant - Transaction] to App
 #  then Receive Token
 def Merchant_Com_App(client_socket_app):
-    
+
     # NFC happens here, Then Merchant send [Merchant, Transaction] to Payment App
 
     # Handshake (Merchant - Payment App)
@@ -21,11 +21,15 @@ def Merchant_Com_App(client_socket_app):
         "transaction": transaction,
         "merchant": merchant,
     }
-    print(f"Merchant: sending [ Merchant({data['merchant']}) - Transaction({data['transaction']}) ]")
-    sendData_RSA(client_socket_app, data,MERCHANT_KEY, PAYMENT_KEY)
+    print(
+        f"Merchant: sending [ Merchant({data['merchant']}) - Transaction({data['transaction']}) ]")
+    sleep(0.5)
+
+    sendData_RSA(client_socket_app, data, MERCHANT_KEY, PAYMENT_KEY)
 
     print("\n=======================================")
     print("waiting for the token...\n")
+    sleep(0.5)
 
     # receive token from Payment App
     data = receiveData_RSA(client_socket_app, PAYMENT_KEY, MERCHANT_KEY)
@@ -44,13 +48,17 @@ def Merchant_Bank_general(client_socket_bank, token):
     Handshake_client_Com(client_socket_bank, "Merchant")
 
     # send token and Merchant data to the bank
-    print(f"Merchant: sending [ \n\t- Merchant({merchant}) \n\t- transaction({transaction}) \n\t- token({token}) \n\t] to the Bank")
+    print(
+        f"Merchant: sending [ \n\t- Merchant({merchant}) \n\t- transaction({transaction}) \n\t- token({token}) \n\t] to the Bank")
+    sleep(0.5)
     data = {"token": token,
             "merchant_id": str(merchant["merchant_id"]), "transaction": transaction}
+    sleep(0.5)
     sendData_RSA(client_socket_bank, data, MERCHANT_KEY, BANK_KEY)
-    
+
     print("\n=======================================")
     print("waiting for the transaction approval...\n")
+    sleep(0.5)
 
     # receive transaction approval from the bank
     data = receiveData_RSA(client_socket_bank, BANK_KEY, MERCHANT_KEY)
@@ -60,16 +68,20 @@ def Merchant_Bank_general(client_socket_bank, token):
 
 # NOTE: Call Merchant_Bank_general
 #  then send transaction approval to the Payment App
+
+
 def Merchant_Bank_admin(client_socket_bank, token):
 
     data = Merchant_Bank_general(client_socket_bank, token)
 
     # send transaction approval to Paymaent App
-    print(f"Merchant: sending [ Transaction approval( \"{data}\" ) ] to the App")
-    sendData_RSA(client_socket_app, data,MERCHANT_KEY, PAYMENT_KEY)
+    print(
+        f"Merchant: sending [ Transaction approval( \"{data}\" ) ] to the App")
+    sleep(0.5)
+
+    sendData_RSA(client_socket_app, data, MERCHANT_KEY, PAYMENT_KEY)
     data = receiveData_RSA(client_socket_app, PAYMENT_KEY, MERCHANT_KEY)
     print(data)
-
 
 
 # =================================================
@@ -77,13 +89,15 @@ def Merchant_Bank_admin(client_socket_bank, token):
 ###############################################################################################################
 ####################################################################### Main ########################################################################
 ###############################################################################################################
-mint=0
-tint=0
+mint = 0
+tint = 0
 
-merchants=[{"merchant_id": 11111111},{"merchant_id": 22222222},{"merchant_id": 33333333},{"merchant_id": 44444444}]
+merchants = [{"merchant_id": 11111111}, {"merchant_id": 22222222}, {
+    "merchant_id": 33333333}, {"merchant_id": 44444444}]
 
 merchant = merchants[mint]
-transactions = [{"transactionID": '11111',"price": 100, },{"transactionID": '22222',"price": 1000, },{"transactionID": '33333',"price": 5000, },{"transactionID": '44444',"price": 50000, }]
+transactions = [{"transactionID": '11111', "price": 100, }, {"transactionID": '22222', "price": 1000, }, {
+    "transactionID": '33333', "price": 5000, }, {"transactionID": '44444', "price": 50000, }]
 transaction = transactions[tint]
 approved_transaction = False
 token = ""
@@ -107,7 +121,6 @@ if mode == "1":
     # Merchant act as a server with the PayAPP
     print(f"Openning The Store... (please wait)")
 
-
     merchant_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     merchant_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     merchant_socket.bind((IP, MERCHANT_PORT))
@@ -119,7 +132,6 @@ if mode == "1":
 
     print(f"Store Open...")
     print("=======================================\n")
-
 
     client_socket_app = acceptConnection(merchant_socket)
     print("Payment App is connecting...")
@@ -146,10 +158,10 @@ else:
     client_socket_bank = requestConnection(BANK_PORT)
     data = Merchant_Bank_general(client_socket_bank, token)
     if data == "Successful Transaction":
-        print("\t\t==== [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] ====\n")
+        print(
+            "\t\t==== [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] [̲̅$̲̅(̲̅ιο̲̅̅ο̲̅̅)̲̅$̲̅] ====\n")
         print("\t\t==== (̅_̅_̅_̅(̅_̅_̅_̅_̅_̅_̅_̅_̅̅_̅()ڪے~ ~ ====\n")
     else:
         print("\t\t==== OH NOOOOOOOOOOOO ====\n")
         print("\t\t====     ( 눈_눈)     ====\n")
         print("\t\t====     ( ˃̣̣̥⌓˂̣̣̥)      ====\n\n\n\n")
-    

@@ -1,6 +1,7 @@
 import hashlib
 import pandas as pd
 import pathlib
+import random
 
 order = {
     0: "Bank",
@@ -40,7 +41,7 @@ class Bank:
             result = temp_hash.hexdigest()
 
             if result == token:
-                response=""
+                response = ""
                 # i found it so check on balance to see if i can make transaction
                 if int(row[5]) >= product_price:
                     new_balance = int(row[5]) - product_price
@@ -51,20 +52,16 @@ class Bank:
                     print("Successful Transaction")
                     print(
                         "we assume that credits were sent to merchant bank account sucessfully")
-                    
-                    response="Successful Transaction"
+
+                    response = "Successful Transaction"
                 else:
                     print("No money, Unsuccessful Transaction")
-                    response="No money, Unsuccessful Transaction"
-                
+                    response = "No money, Unsuccessful Transaction"
+
                 filter = self.tokens_df[self.tokens_df["token"] == token]
                 self.tokens_df = self.tokens_df.drop(filter.index)
-                self.tokens_df.to_csv(BANK_TOKENS_DB_PATH,index=False)
+                self.tokens_df.to_csv(BANK_TOKENS_DB_PATH, index=False)
                 return response
-
-                
-
-                
 
         print("Wrong token")
         return "Wrong token"
@@ -77,11 +74,10 @@ class Bank:
         self.tokenized_list = self.tokens_df["token"]
 
     def tokenize(self, credit_card, cvv, merchant_id, transaction_id):
-        print(credit_card, cvv, merchant_id, transaction_id)
-        print(self.credit_card_df)
+        
         # check if the card is present
         filter = self.credit_card_df[(self.credit_card_df["number"]
-                                     == int(credit_card)) & (self.credit_card_df["cvv"] == int(cvv))]
+                                     == credit_card) & (self.credit_card_df["cvv"] == cvv)]
         print(filter)
         if len(filter) == 0:
             print("unsuccessful tokenization, The card given or cvv is wrong".title())
