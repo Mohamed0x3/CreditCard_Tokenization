@@ -40,6 +40,7 @@ class Bank:
             result = temp_hash.hexdigest()
 
             if result == token:
+                response=""
                 # i found it so check on balance to see if i can make transaction
                 if int(row[5]) >= product_price:
                     new_balance = int(row[5]) - product_price
@@ -50,16 +51,26 @@ class Bank:
                     print("Successful Transaction")
                     print(
                         "we assume that credits were sent to merchant bank account sucessfully")
-                    return "Successful Transaction"
+                    
+                    response="Successful Transaction"
                 else:
                     print("No money, Unsuccessful Transaction")
-                    return "No money, Unsuccessful Transaction"
+                    response="No money, Unsuccessful Transaction"
+                
+                filter = self.tokens_df[self.tokens_df["token"] == token]
+                self.tokens_df = self.tokens_df.drop(filter.index)
+                self.tokens_df.to_csv(BANK_TOKENS_DB_PATH,index=False)
+                return response
+
+                
+
+                
 
         print("Wrong token")
         return "Wrong token"
 
-    def addToken(self, token,merchant_id,transaction_id):
-        newDF = pd.DataFrame({"token": token,"merchant_id":merchant_id,"transaction_id":transaction_id}, index=[
+    def addToken(self, token, merchant_id, transaction_id):
+        newDF = pd.DataFrame({"token": token, "merchant_id": merchant_id, "transaction_id": transaction_id}, index=[
                              len(self.tokenized_list)])
         self.tokens_df = pd.concat([self.tokens_df, newDF], axis=0)
         self.tokens_df.to_csv(BANK_TOKENS_DB_PATH, index=False)
@@ -83,7 +94,7 @@ class Bank:
             # hashing and put result in result
             result = token.hexdigest()
 
-            self.addToken(result,merchant_id,transaction_id)
+            self.addToken(result, merchant_id, transaction_id)
             print("successful tokenization".title())
 
             return result
