@@ -194,7 +194,7 @@ end
 ## 👨‍💻 Technical Stuff
 
 - Communication between modules(PaymentApp, Bank, Merchant) is done using Sockets.
-- Communication is secure. It is encrypted and decrypted using AES with public/private keys.
+- Communication is secure. It is encrypted and decrypted using RSA with public/private keys.
 
 ## ➡️ More Info
 
